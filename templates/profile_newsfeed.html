@@ -1,0 +1,12 @@
+{% extends "profile.html" %}
+{% block profile_content %}
+<h1>{{ content.feed.title }}</h1>
+<ul>
+{% for entry in content.entries %}
+  <li>
+  	<h4><a href="{{ entry.link }}">{{ entry.title }}</a></h4>
+  	<p>{{ entry.summary|safe }}</p>
+  </li>
+{% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "profile.html" %}
+{% block profile_content %}
+<h1>{{ content["title"] }}</h1>
+<ul>
+{% for key in content["content"] %}
+  <li>
+  	<h4><a href="">{{ content["content"][key] }}</a></h4>
+  </li>
+{% endfor %}
+</ul>
+{% endblock %}

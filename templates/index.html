@@ -1,44 +1,24 @@
-<!DOCTYPE html>
-<html>
-<head>	
-	<title>Title</title>
-
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-	<link rel="stylesheet" type="text/css" href="/static/css/kube.min.css" /> 	
-	<link rel="stylesheet" type="text/css" href="/static/css/master.css" /> 		
-
-	<script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>	
-	
-	<!--[if lt IE 9]>
-	<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-	<![endif]-->		
-
-</head>
-<body>
-<div id="page">
-	<div class="container row">
-		<form class="forms" method="post">
-			<ul class="multicolumn">
-				<li class="width-80">
-					<label class="bold">Profile URL</label>
-					<input
-						class="{% if error %}input-error{% endif %}"
-						type="url"
-						name="register_url"
-						placeholder="http://your-domain/profile.json"
-						{% if register_url %}value="{{ register_url }}"{% endif %}
-						size="40">
-				</li>				
-				<li class="width-20">
-					<label class="bold">&nbsp;</label>
-					<input type="submit" class="btn">
-				</li>
-			</ul>
-			{% if error %}<span class="error">{{ error }}</span>{% endif %}
-		</form>
-	</div>	
+{% extends "base.html" %}
+{% block content %}
+<div class="container row">
+	<form class="forms" method="post">
+		<ul class="multicolumn">
+			<li class="width-80">
+				<label class="bold">Profile URL</label>
+				<input
+					class="{% if error %}input-error{% endif %}"
+					type="url"
+					name="register_url"
+					placeholder="http://your-domain/profile.json"
+					{% if register_url %}value="{{ register_url }}"{% endif %}
+					size="40">
+			</li>				
+			<li class="width-20">
+				<label class="bold">&nbsp;</label>
+				<input type="submit" class="btn">
+			</li>
+		</ul>
+		{% if error %}<span class="error">{{ error }}</span>{% endif %}
+	</form>
 </div>	
-</body>
-</html>
+{% endblock %}

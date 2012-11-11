@@ -12,13 +12,19 @@ from flask import (Flask, render_template, request, redirect, session, g, jsonif
                    flash, send_from_directory, abort, make_response)
 import sys, redis
 import ordereddict
+import markdown
+import html2text
+import feedparser
 
 r = redis.StrictRedis(host='localhost', port=6379, db=4)
 #r.flushdb()
+
+md = markdown.Markdown(safe_mode="escape", output_format='html4')
+h2t = html2text.HTML2Text()
                    
 app = Flask(__name__)
 app.config["SERVER_NAME"] = "eeepc:5000"
-	
+
 @app.route("/", methods=['GET', 'POST'])
 def register():
 	if request.method == 'GET':
@@ -49,12 +55,14 @@ def register():
 		r.set("profileloc:" + userid, register_url)
 		return redirect("http://" + userid + "." + app.config["SERVER_NAME"])
 
-@app.route("/<userid>")
-@app.route("/<userid>/<contentkey>")
+@app.route("/u/<userid>")
+@app.route("/u/<userid>/<contentkey>")
+@app.route("/u/<userid>/<contentkey>/<pagekey>")
 @app.route("/", subdomain="<userid>")
 @app.route("/<contentkey>", subdomain="<userid>")
+@app.route("/<contentkey>/<pagekey>", subdomain="<userid>")
 def profile(userid, contentkey=None):
-	if userid is not "www":
+	if userid != "www":
 		if not r.exists("profileloc:" + userid):
 			return abort(404)
 		
@@ -77,13 +85,62 @@ def profile(userid, contentkey=None):
 				return redirect("/" + key)
 			return render_template("profile.html", error="Content section in profile is empty")
 		else:
+			menu = []
+			for key, value in profile["content"].iteritems():
+				menu.append(profile["content"][key]["title"])
+			if contentkey not in profile["content"]:
+				return abort(404)
 			content = profile["content"][contentkey]
+			if content.has_key("type"):
+				content_type = content["type"]
+			else:
+				content_type = "article"
+			
+			if content_type == "article":
+				return doArticle(profile, contentkey, content["content"])
+			if content_type == "rss" or content_type == "atom" or content_type == "newsfeed":
+				return doNewsFeed(profile, contentkey, content["content"])
+			if content_type == "blog":
+				return doBlog(profile, contentkey, content["content"])
 
-
-
-	else:
-		return register()
+def doArticle(profile, contentkey, source):
+	try:
+		data = urlopen(source)
+	except:
+		abort(404)
+	userid = profile["settings"]["id"]
+	if not r.exists("cache:" + userid + ":" + contentkey):
+		r.set("cache:" + userid + ":" + contentkey, md.convert(h2t.handle(data.read())))
+		r.expire("cache:" + userid + ":" + contentkey, 24 * 60 * 60)
 	
+	content = r.get("cache:" + userid + ":" + contentkey)
+	return render_template("profile_article.html", profile=profile, content=content)
+
+def doNewsFeed(profile, contentkey, source):
+	try:
+		data = urlopen(source)
+	except:
+		abort(404)
+	userid = profile["settings"]["id"]
+	if not r.exists("cache:" + userid + ":" + contentkey):
+		r.set("cache:" + userid + ":" + contentkey, data.read())
+		r.expire("cache:" + userid + ":" + contentkey, 24 * 60 * 60)
+	content = feedparser.parse(r.get("cache:" + userid + ":" + contentkey))
+	return render_template("profile_newsfeed.html", profile=profile, content=content)
+
+def doBlog(profile, contentkey, source):
+	content = profile["content"][contentkey]
+	for key in content["content"]:
+		try:
+			urlopen(content["content"][key]["source"])
+		except:
+			print "0"
+	userid = profile["settings"]["id"]
+	if not r.exists("cache:" + userid + ":" + contentkey):
+		r.set("cache:" + userid + ":" + contentkey, data.read())
+		r.expire("cache:" + userid + ":" + contentkey, 24 * 60 * 60)
+	
+	return render_template("profile_blog.html", profile=profile, content=content)
 
 if __name__ == "__main__":
-	app.run(host='0.0.0.0',debug=True)
+	app.run(host='0.0.0.0', debug=True)
