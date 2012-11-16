@@ -1,11 +1,27 @@
 {% extends "profile.html" %}
 {% block profile_content %}
+{% block title %}{{ content["title"] }}{% endblock %}
 <h1>{{ content["title"] }}</h1>
 <ul>
 {% for key in content["content"] %}
   <li>
-  	<h4><a href="">{{ content["content"][key] }}</a></h4>
+  	{{ content["content"][key]["content"]|safe }}
+  	<small>
+  		<a
+  			href="http://{{ profile["settings"]['id'] }}.{{ config["SERVER_NAME"] }}/{{ contentkey }}/{{content["content"][key]["key"]}}#disqus_thread"
+  			data-disqus-identifier="{{ content["content"][key]["key"] }}"
+  		></a>
+  	</small>
   </li>
 {% endfor %}
 </ul>
+<script type="text/javascript">
+var disqus_shortname = '{{ profile["settings"]["disqus_shortname"] }}';
+(function () {
+var s = document.createElement('script'); s.async = true;
+s.type = 'text/javascript';
+s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+(document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+}());
+</script>
 {% endblock %}
