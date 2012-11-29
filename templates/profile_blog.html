@@ -1,16 +1,16 @@
 {% extends "profile.html" %}
+{% block title %}{{ content["title"] }} ⇠ {{ super() }}{% endblock %}
 {% block profile_content %}
-{% block title %}{{ content["title"] }}{% endblock %}
-<h1>{{ content["title"] }}</h1>
-<ul>
+<ul class="posts">
 {% for key in content["content"] %}
-  <li>
+  <li class="post">
+  	<small>{{ content["content"][key]["created"] }}</small>
   	{{ content["content"][key]["content"]|safe }}
   	<small>
   		<a
   			href="http://{{ profile["settings"]['id'] }}.{{ config["SERVER_NAME"] }}/{{ contentkey }}/{{content["content"][key]["key"]}}#disqus_thread"
   			data-disqus-identifier="{{ content["content"][key]["key"] }}"
-  		></a>
+  		>&nbsp;</a>
   	</small>
   </li>
 {% endfor %}

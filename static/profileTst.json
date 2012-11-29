@@ -1,0 +1,99 @@
+{
+	"settings" : {
+		"id" : "test",
+		"name" : "",
+		"avatar" : "http://www.gravatar.com/avatar/98d92490cad64c8ff544b4ec3a0482cd?s=200",
+		"disqus_shortname" : "saibotd"
+	},
+	"content" : {
+		"projects" : {
+			"title" : "Things I've made",
+			"content" : "http://saibotd.com/projects.html"
+		},
+		"redditmag-plus-development" : {
+			"title" : "redditmag+ Development",
+			"type" : "blog",
+			"content" : {
+				"introduction" : {
+					"created" : "2012-01-31 11:16",
+					"content" : "http://saibotd.com/redditmagplus/introduction.md"
+				}
+			}
+		},
+		"hackerhubdev" : {
+			"title" : "Hacker Hub Development",
+			"type" : "blog",
+			"content" : {
+				"custom-stylesheets" : {
+					"created" : "2011-10-25 10:32",
+					"content" : "http://saibotd.com/hackerhubdev/custom-stylesheets.md"
+				},
+				"atom-support" : {
+					"created" : "2011-10-11 20:25",
+					"content" : "http://saibotd.com/hackerhubdev/atom-support.md"
+				},
+				"first" : {
+					"created" : "2011-10-03 14:37",
+					"content" : "http://saibotd.com/hackerhubdev/and-off-it-goes.md"
+				}
+			}
+		},
+		"twitter" : {
+			"title" : "Twitter",
+			"type" : "twitter",
+			"screen_name" : "saibotd"
+		},
+		"bitbucket-activity" : {
+			"title" : "Bitbucket activity",
+			"type" : "atom",
+			"show_description" : true,
+			"content" : "https://bitbucket.org/saibotd/atom/feed?token=1d0749261f3f35a0468608e9e11c3c71"
+		},
+		"gamereviews" : {
+			"title" : "Short game reviews",
+			"type" : "blog",
+			"content" : {
+				"waht": {
+					"content" : "http://saibotd.com/gamereviews/what.md"
+				},
+				"dragonage2" : {
+					"content" : "http://saibotd.com/gamereviews/dragonage2.md"
+				},
+				"bayonetta" : {
+					"content" : "http://saibotd.com/gamereviews/bayonetta.md"
+				},
+				"nfshotpursuit" : {
+					"content" : "http://saibotd.com/gamereviews/nfshotpursuit.md"
+				},
+				"fnv" : {
+					"content" : "http://saibotd.com/gamereviews/fnv.md"
+				},
+				"reddeadredemption" : {
+					"content" : "http://saibotd.com/gamereviews/reddeadredemption.md"
+				},
+				"batmanarkhamasylum" : {
+					"content" : "http://saibotd.com/gamereviews/batmanarkhamasylum.md"
+				},
+				"masseffect" : {
+					"content" : "http://saibotd.com/gamereviews/masseffect.md"
+				},
+				"limbo" : {
+					"content" : "http://saibotd.com/gamereviews/limbo.md"
+				},
+				"battlefield1943" : {
+					"content" : "http://saibotd.com/gamereviews/battlefield1943.md"
+				},
+				"fallout3" : {
+					"content" : "http://saibotd.com/gamereviews/fallout3.md"
+				},
+				"defensegrid" : {
+					"content" : "http://saibotd.com/gamereviews/defensegrid.md"
+				}
+			}
+		},
+		"contact" : {
+			"title" : "Contact",
+			"content" : "http://saibotd.com/contact.md"
+		}
+	}
+}

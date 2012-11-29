@@ -57,11 +57,11 @@ def register():
 
 @app.route("/u/<userid>")
 @app.route("/u/<userid>/<contentkey>")
-@app.route("/u/<userid>/<contentkey>/<pagekey>")
+@app.route("/u/<userid>/<contentkey>/<subcontentkey>")
 @app.route("/", subdomain="<userid>")
 @app.route("/<contentkey>", subdomain="<userid>")
-@app.route("/<contentkey>/<pagekey>", subdomain="<userid>")
-def profile(userid, contentkey=None):
+@app.route("/<contentkey>/<subcontentkey>", subdomain="<userid>")
+def profile(userid, contentkey=None, subcontentkey=None):
 	if userid != "www":
 		if not r.exists("profileloc:" + userid):
 			return abort(404)
@@ -101,46 +101,79 @@ def profile(userid, contentkey=None):
 			if content_type == "rss" or content_type == "atom" or content_type == "newsfeed":
 				return doNewsFeed(profile, contentkey, content["content"])
 			if content_type == "blog":
-				return doBlog(profile, contentkey, content["content"])
+				return doBlog(profile, contentkey, subcontentkey)
+			if content_type == "twitter":
+				return doTwitter(profile, contentkey, content["screen_name"])
 
 def doArticle(profile, contentkey, source):
-	try:
-		data = urlopen(source)
-	except:
-		abort(404)
 	userid = profile["settings"]["id"]
 	if not r.exists("cache:" + userid + ":" + contentkey):
-		r.set("cache:" + userid + ":" + contentkey, md.convert(h2t.handle(data.read())))
+		try:
+			data = urlopen(source)
+		except:
+			abort(404)
+		content = data.read()
+		if source[-4:] == "html":
+			content = h2t.handle(content)
+		r.set("cache:" + userid + ":" + contentkey, md.convert(content))
 		r.expire("cache:" + userid + ":" + contentkey, 24 * 60 * 60)
-	
 	content = r.get("cache:" + userid + ":" + contentkey)
-	return render_template("profile_article.html", profile=profile, content=content)
+	return render_template("profile_article.html", profile=profile, contentkey=contentkey, content=content)
 
 def doNewsFeed(profile, contentkey, source):
-	try:
-		data = urlopen(source)
-	except:
-		abort(404)
 	userid = profile["settings"]["id"]
 	if not r.exists("cache:" + userid + ":" + contentkey):
+		try:
+			data = urlopen(source)
+		except:
+			abort(404)
 		r.set("cache:" + userid + ":" + contentkey, data.read())
 		r.expire("cache:" + userid + ":" + contentkey, 24 * 60 * 60)
 	content = feedparser.parse(r.get("cache:" + userid + ":" + contentkey))
 	return render_template("profile_newsfeed.html", profile=profile, content=content)
 
-def doBlog(profile, contentkey, source):
-	content = profile["content"][contentkey]
-	for key in content["content"]:
-		try:
-			urlopen(content["content"][key]["source"])
-		except:
-			print "0"
+def doBlog(profile, contentkey, subcontentkey=None):
 	userid = profile["settings"]["id"]
 	if not r.exists("cache:" + userid + ":" + contentkey):
+		content = profile["content"][contentkey]
+		for key in content["content"]:
+			source = content["content"][key]["content"]
+			try:
+				data = urlopen(source)
+				data = data.read()
+			except:
+				data = ""
+			if source[-4:] == "html":
+				data = h2t.handle(data)
+			content["content"][key]["key"] = key
+			content["content"][key]["content"] = md.convert(data)
+		r.set("cache:" + userid + ":" + contentkey, simplejson.dumps(content))
+		r.expire("cache:" + userid + ":" + contentkey, 24 * 60 * 60)
+	content = simplejson.loads(r.get("cache:" + userid + ":" + contentkey), object_pairs_hook=ordereddict.OrderedDict)	
+	if subcontentkey:
+		blogtitle = content["title"]
+		return render_template(
+			"profile_blog_article.html",
+			profile=profile,
+			blogtitle=blogtitle,
+			contentkey=contentkey,
+			subcontentkey=subcontentkey,
+			content=content["content"][subcontentkey])
+	else:
+		return render_template("profile_blog.html", profile=profile, contentkey=contentkey, content=content)
+
+def doTwitter(profile, contentkey, screen_name):
+	userid = profile["settings"]["id"]
+	if not r.exists("cache:" + userid + ":" + contentkey):
+		try:
+			data = urlopen("https://api.twitter.com/1/statuses/user_timeline.json?include_entities=true&include_rts=true&screen_name="+screen_name+"&count=25")
+		except:
+			abort(404)
 		r.set("cache:" + userid + ":" + contentkey, data.read())
 		r.expire("cache:" + userid + ":" + contentkey, 24 * 60 * 60)
-	
-	return render_template("profile_blog.html", profile=profile, content=content)
+	content = simplejson.loads(r.get("cache:" + userid + ":" + contentkey), object_pairs_hook=ordereddict.OrderedDict)	
+	print content
+	return render_template("profile_twitter.html", profile=profile, content=content)
 
 if __name__ == "__main__":
 	app.run(host='0.0.0.0', debug=True)

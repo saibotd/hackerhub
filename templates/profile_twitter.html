@@ -1,0 +1,12 @@
+{% extends "profile.html" %}
+{% block title %}{{ contentkey }} ⇠ {{ super() }}{% endblock %}
+{% block profile_content %}
+<ul class="feed">
+{% for entry in content %}
+  <li class="item">
+  	<small>{{ entry.created_at }}</small>
+  	<p><a href="https://twitter.com/{{ entry.user.screen_name }}/status/{{ entry.id }}">{{ entry.text }}</a></p>
+  </li>
+{% endfor %}
+</ul>
+{% endblock %}

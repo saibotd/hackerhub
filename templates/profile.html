@@ -1,19 +1,27 @@
 {% extends "base.html" %}
 {% block title %}{{ profile["settings"]["id"] }}{% endblock %}
+{% block head %}
+	{{ super() }}
+	<link rel="shortcut icon" href="{{ profile["settings"]["avatar"] }}" />
+{% endblock %}
+
 {% block content %}
 <div class="container row">
-	<div class="third">
+	<div class="quarter">
 		<img id="avatar" src="{{ profile["settings"]["avatar"] }}">
-		<ul>
-		{% for key in profile["content"] %}
-		  <li>
-		  	<a href="/{{ key }}">
-		  		{{ profile["content"][key]["title"] }}
-		  	</a>
-		  </li>
-		{% endfor %}
-		</ul>
+		<h5>{{ profile["settings"]["id"] }}</h5>
+		<nav id="mainmenu">
+			<ul>
+			{% for key in profile["content"] %}
+			  <li{% if contentkey == key %} class="active"{% endif %}>
+			  	<a href="/{{ key }}">
+			  		{{ profile["content"][key]["title"] }}
+			  	</a>
+			  </li>
+			{% endfor %}
+			</ul>
+		</nav>
 	</div>
-	<div class="twothird">{% block profile_content %}{% endblock %}</div>
+	<div class="threequarter">{% block profile_content %}{% endblock %}</div>
 </div>	
 {% endblock %}
